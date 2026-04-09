@@ -58,7 +58,7 @@ def make_context(
 
 
 def run_async(coro: object) -> object:
-    return asyncio.get_event_loop().run_until_complete(coro)
+    return asyncio.run(coro)
 
 
 # ---------------------------------------------------------------------------

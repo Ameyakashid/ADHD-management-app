@@ -9,7 +9,7 @@ The module exposes pure functions and pydantic models — no global state.
 
 import logging
 from pathlib import Path
-from typing import Literal
+from typing import Literal, Protocol
 
 import yaml
 from pydantic import BaseModel, model_validator
@@ -86,9 +86,15 @@ class StateConfig(BaseModel):
 class DetectionResult(BaseModel):
     """Output of a state detection call."""
 
-    previous_state: str
-    detected_state: str
+    previous_state: StateName
+    detected_state: StateName
     is_transition_blocked: bool
+
+
+class LLMCallable(Protocol):
+    """Protocol for the async LLM call function passed to detect_state."""
+
+    async def __call__(self, prompt: str) -> str: ...
 
 
 # ---------------------------------------------------------------------------
@@ -191,7 +197,7 @@ def normalize_llm_response(raw_response: str) -> str:
     if cleaned in ALL_STATES:
         return cleaned
     # Handle cases where LLM wraps the state in quotes or adds minor noise
-    for state in ALL_STATES:
+    for state in sorted(ALL_STATES):
         if state in cleaned:
             return state
     raise ValueError(
@@ -204,7 +210,7 @@ async def detect_state(
     message: str,
     current_state: str,
     config: StateConfig,
-    llm_call: "LLMCallable",
+    llm_call: LLMCallable,
 ) -> DetectionResult:
     """Detect the user's cognitive state from their message.
 
@@ -234,13 +240,3 @@ async def detect_state(
     detected = normalize_llm_response(raw_response)
 
     return enforce_transition(current_state, detected, config)
-
-
-# Type alias for the LLM call dependency
-from typing import Protocol
-
-
-class LLMCallable(Protocol):
-    """Protocol for the async LLM call function passed to detect_state."""
-
-    async def __call__(self, prompt: str) -> str: ...
