@@ -29,9 +29,9 @@ If you are an LLM agent in any IDE (Antigravity, Cursor, Claude Code, etc.) and 
 ---
 
 ### [build-scaffolding]
-> Pipeline scaffolding: plan.md, index.md, code-rules.md, task specs — bootstrapped from PROJECT_BRIEF.md
+> Pipeline scaffolding: plan.md, index.md, code-rules.md, all 8 task specs, subtask descriptions — bootstrapped from PROJECT_BRIEF.md
 - Status: DONE
 - Task: 01/sub-01
-- Files: _build/plan.md, _build/index.md, _build/code-rules.md, _build/tasks/01-foundation/spec.md
+- Files: _build/plan.md, _build/index.md, _build/code-rules.md, _build/tasks/01-foundation/spec.md, _build/tasks/01-foundation/sub-01/description.md, _build/tasks/01-foundation/sub-02/description.md, _build/tasks/02-personality/spec.md, _build/tasks/03-task-crud/spec.md, _build/tasks/04-memory/spec.md, _build/tasks/05-scheduling/spec.md, _build/tasks/06-buffer/spec.md, _build/tasks/07-voice/spec.md, _build/tasks/08-dashboard/spec.md
 - Depends on: none
-- Detail: _build/tasks/01-foundation/sub-01/01-01i.md
+- Detail: _build/tasks/01-foundation/sub-01/01-01x.md
