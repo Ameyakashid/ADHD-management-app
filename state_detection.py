@@ -123,7 +123,7 @@ def load_state_config(config_path: Path) -> StateConfig:
 
 def build_classification_prompt(
     message: str,
-    current_state: str,
+    current_state: StateName,
     config: StateConfig,
 ) -> str:
     """Build the LLM classification prompt from config and user message."""
@@ -154,8 +154,8 @@ def build_classification_prompt(
 # ---------------------------------------------------------------------------
 
 def enforce_transition(
-    current_state: str,
-    llm_detected: str,
+    current_state: StateName,
+    llm_detected: StateName,
     config: StateConfig,
 ) -> DetectionResult:
     """Apply Markov transition constraints to the LLM classification.
@@ -191,7 +191,7 @@ def enforce_transition(
 # LLM classification
 # ---------------------------------------------------------------------------
 
-def normalize_llm_response(raw_response: str) -> str:
+def normalize_llm_response(raw_response: str) -> StateName:
     """Extract a valid state name from raw LLM output."""
     cleaned = raw_response.strip().lower().rstrip(".")
     if cleaned in ALL_STATES:
@@ -208,7 +208,7 @@ def normalize_llm_response(raw_response: str) -> str:
 
 async def detect_state(
     message: str,
-    current_state: str,
+    current_state: StateName,
     config: StateConfig,
     llm_call: LLMCallable,
 ) -> DetectionResult:
