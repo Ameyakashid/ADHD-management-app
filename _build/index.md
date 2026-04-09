@@ -43,3 +43,11 @@ If you are an LLM agent in any IDE (Antigravity, Cursor, Claude Code, etc.) and 
 - Files: requirements.txt, setup_workspace.py, .env.example, .gitignore, workspace/SOUL.md, workspace/USER.md, workspace/HEARTBEAT.md, workspace/config.json.template, tests/test_setup_workspace.py
 - Depends on: [build-scaffolding]
 - Detail: _build/tasks/01-foundation/sub-02/01-02x.md
+
+### [bot-smoke-tests]
+> 18 smoke tests proving nanobot-ai config loads, provider resolves, and bot can start — validates sub-02 workspace setup
+- Status: DONE
+- Task: 01/sub-03
+- Files: tests/test_bot_smoke.py
+- Depends on: [nanobot-workspace-setup]
+- Detail: _build/tasks/01-foundation/sub-03/01-03x.md
