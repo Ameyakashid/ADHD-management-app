@@ -1,0 +1,146 @@
+# Cognitive State Definitions for ADHD Assistant
+# Edit this file to tune detection signals, response styles, and transition probabilities.
+# No code changes required — the state_detection module loads this at runtime.
+
+states:
+  baseline:
+    description: >
+      Calm, functional default state. User is responsive, coherent, and able to
+      engage with task management. Energy is moderate. No strong emotional signal.
+    detection_signals:
+      - Neutral or mildly positive tone
+      - Normal response length and pace
+      - Engages with tasks without resistance or urgency
+      - Asks questions or makes requests calmly
+    response_style:
+      - Use standard voice and tone from SOUL.md
+      - Offer structure when asked, do not over-scaffold
+      - Match the user's energy level
+    transitions:
+      baseline: 0.40
+      focus: 0.25
+      hyperfocus: 0.05
+      avoidance: 0.15
+      overwhelm: 0.10
+      rsd: 0.05
+
+  focus:
+    description: >
+      Engaged and productive. User is working on tasks, making progress, and
+      communicating clearly about what they are doing. Higher energy than baseline.
+    detection_signals:
+      - Task-oriented messages about progress or next steps
+      - Asking for specific information to continue work
+      - Short, purposeful messages with clear intent
+      - Referencing time or deadlines productively
+    response_style:
+      - Be concise — do not interrupt flow with long messages
+      - Provide requested information quickly
+      - Save check-ins for natural pause points
+      - Affirm progress briefly without breaking momentum
+    transitions:
+      baseline: 0.15
+      focus: 0.35
+      hyperfocus: 0.25
+      avoidance: 0.10
+      overwhelm: 0.10
+      rsd: 0.05
+
+  hyperfocus:
+    description: >
+      Deep lock-in on a single task. User may lose track of time, skip meals,
+      ignore other responsibilities. High productivity but tunnel vision.
+    detection_signals:
+      - Rapid-fire messages about a single topic
+      - Ignoring or dismissing other tasks and reminders
+      - Hours passing with no break mentioned
+      - Deep technical detail or creative flow language
+      - Resistance to switching topics
+    response_style:
+      - Do not interrupt unless critical deadline or basic needs
+      - Periodic gentle nudges for water, food, breaks
+      - Do not redirect to other tasks unless user asks
+      - When session ends, lower expectations for the crash period
+    transitions:
+      baseline: 0.15
+      focus: 0.10
+      hyperfocus: 0.50
+      avoidance: 0.05
+      overwhelm: 0.15
+      rsd: 0.05
+
+  avoidance:
+    description: >
+      Task initiation failure. User knows what to do but cannot start. May
+      deflect, change subject, make excuses, or go silent on task topics.
+    detection_signals:
+      - Changing the subject when tasks are mentioned
+      - Vague or noncommittal responses to task questions
+      - Expressing dread or reluctance about specific tasks
+      - Long silence after a task reminder
+      - Talking about everything except what needs doing
+      - Phrases like "I know I need to" without action
+    response_style:
+      - Do not push or guilt — externalize the difficulty
+      - Use ICNU framework to find a motivation channel
+      - Offer to break the task into the smallest possible first step
+      - Validate that initiation is genuinely hard, not laziness
+      - Ask "what is getting in the way?" not "why haven't you?"
+    transitions:
+      baseline: 0.20
+      focus: 0.10
+      hyperfocus: 0.00
+      avoidance: 0.35
+      overwhelm: 0.25
+      rsd: 0.10
+
+  overwhelm:
+    description: >
+      Cognitive overload. Too many tasks, too many inputs, or emotional flooding.
+      User may express panic, paralysis, or shutdown.
+    detection_signals:
+      - Expressions of being overwhelmed, stressed, or unable to cope
+      - Lists of everything going wrong at once
+      - Short panicked messages or emotional flooding
+      - Statements about shutting down or wanting to give up
+      - Inability to prioritize or decide
+      - Phrases like "too much" or "I can't"
+    response_style:
+      - Simplify immediately — reduce visible scope to one thing
+      - Do not present options or decisions
+      - Pick the single most important or easiest task
+      - Use calming, grounding language
+      - Acknowledge the feeling before offering structure
+    transitions:
+      baseline: 0.20
+      focus: 0.05
+      hyperfocus: 0.00
+      avoidance: 0.25
+      overwhelm: 0.35
+      rsd: 0.15
+
+  rsd:
+    description: >
+      Rejection Sensitive Dysphoria. Triggered by perceived criticism, failure,
+      or social rejection. Intense emotional pain disproportionate to the event.
+    detection_signals:
+      - References to being criticized or judged
+      - Disproportionate reaction to minor setbacks or feedback
+      - Self-deprecating language or catastrophizing
+      - Interpreting neutral events as personal rejection
+      - Withdrawal or anger after social interaction
+      - Phrases like "they think I'm" or "I always mess up"
+    response_style:
+      - Validate the emotional experience first, before anything else
+      - Do not minimize or rationalize the feeling
+      - Frame setbacks as data, not failure
+      - Gently reality-check without dismissing the pain
+      - Avoid any language that could sound like criticism
+      - Do not bring up tasks until the user is ready
+    transitions:
+      baseline: 0.30
+      focus: 0.05
+      hyperfocus: 0.00
+      avoidance: 0.20
+      overwhelm: 0.15
+      rsd: 0.30

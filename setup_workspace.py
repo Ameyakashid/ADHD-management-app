@@ -24,7 +24,7 @@ WORKSPACE_SRC = REPO_ROOT / "workspace"
 NANOBOT_HOME = Path.home() / ".nanobot"
 NANOBOT_WORKSPACE = NANOBOT_HOME / "workspace"
 
-TEMPLATE_FILES = ["SOUL.md", "USER.md", "HEARTBEAT.md"]
+TEMPLATE_FILES = ["SOUL.md", "USER.md", "HEARTBEAT.md", "states.yaml"]
 
 ENV_VARS = {
     "OPENROUTER_API_KEY": "OpenRouter API key",
