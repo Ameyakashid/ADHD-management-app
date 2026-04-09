@@ -28,6 +28,15 @@ If you are an LLM agent in any IDE (Antigravity, Cursor, Claude Code, etc.) and 
 
 ---
 
+### [foundation-complete]
+> Working nanobot-ai v0.1.5 workspace: build pipeline, Telegram bot config, multi-provider LLM (OpenRouter+Ollama), portable deployment, 39 passing tests
+- Status: DONE-WITH-ISSUES
+- Task: 01 (01-foundation)
+- Subtasks: [build-scaffolding], [nanobot-workspace-setup], [bot-smoke-tests]
+- Produces: Configured nanobot-ai workspace deployable to ~/.nanobot/, Telegram bot entry point, multi-provider LLM config (OpenRouter primary, Ollama fallback), build pipeline scaffolding (_build/ with plan, index, code-rules, 8 task specs). Downstream tasks 02-08 can now build on a running bot.
+- Issues: (1) task-verify.md was not generated — no task-level cross-subtask verification exists. (2) code-rules.md has contradictory default parameter rule (lines 12 vs 58). (3) No mypy/pyright enforcement in dev dependencies. All LOW severity.
+- Detail: _build/tasks/01-foundation/sub-03/01-03x.md (latest subtask; no task-verify.md)
+
 ### [build-scaffolding]
 > Pipeline scaffolding: plan.md, index.md, code-rules.md, all 8 task specs, subtask descriptions — bootstrapped from PROJECT_BRIEF.md
 - Status: DONE
@@ -51,3 +60,27 @@ If you are an LLM agent in any IDE (Antigravity, Cursor, Claude Code, etc.) and 
 - Files: tests/test_bot_smoke.py
 - Depends on: [nanobot-workspace-setup]
 - Detail: _build/tasks/01-foundation/sub-03/01-03x.md
+
+### [neuroaffirming-personality]
+> SOUL.md personality definition with neuroaffirming rules, ICNU motivation framework, banned-phrase list, and AUDHD USER.md profile — plus 40 validation tests
+- Status: DONE
+- Task: 02/sub-01
+- Files: workspace/SOUL.md, workspace/USER.md, tests/test_personality.py
+- Depends on: [nanobot-workspace-setup], [bot-smoke-tests]
+- Detail: _build/tasks/02-personality/sub-01/02-01x.md
+
+### [cognitive-state-detection]
+> 6-state cognitive model (Baseline/Focus/Hyperfocus/Avoidance/Overwhelm/RSD) with YAML config, LLM classification prompt, Markov transition enforcement, and StateName-typed DetectionResult — 132 tests across 3 files
+- Status: DONE
+- Task: 02/sub-02
+- Files: workspace/states.yaml, state_detection.py, tests/test_state_config.py, tests/test_state_detection.py
+- Depends on: [nanobot-workspace-setup], [neuroaffirming-personality]
+- Detail: _build/tasks/02-personality/sub-02/02-02x.md
+
+### [state-response-integration]
+> Hook connecting cognitive state detection to SOUL.md response rules — injects state indicator into system prompt, per-state behavior for all 6 states, graceful baseline fallback
+- Status: DONE
+- Task: 02/sub-03
+- Files: state_response_integration.py, workspace/SOUL.md, tests/test_state_response_integration.py
+- Depends on: [neuroaffirming-personality], [cognitive-state-detection]
+- Detail: _build/tasks/02-personality/sub-03/02-03x.md
