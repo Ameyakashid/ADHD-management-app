@@ -134,7 +134,7 @@ class StateResponseHook:
             return await detect_state(
                 message, self._current_state, self._config, self._llm_call
             )
-        except (ValueError, Exception) as exc:
+        except Exception as exc:
             log.warning(
                 "State detection failed, falling back to %s: %s",
                 BASELINE_STATE,
