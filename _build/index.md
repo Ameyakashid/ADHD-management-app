@@ -35,3 +35,11 @@ If you are an LLM agent in any IDE (Antigravity, Cursor, Claude Code, etc.) and 
 - Files: _build/plan.md, _build/index.md, _build/code-rules.md, _build/tasks/01-foundation/spec.md, _build/tasks/01-foundation/sub-01/description.md, _build/tasks/01-foundation/sub-02/description.md, _build/tasks/02-personality/spec.md, _build/tasks/03-task-crud/spec.md, _build/tasks/04-memory/spec.md, _build/tasks/05-scheduling/spec.md, _build/tasks/06-buffer/spec.md, _build/tasks/07-voice/spec.md, _build/tasks/08-dashboard/spec.md
 - Depends on: none
 - Detail: _build/tasks/01-foundation/sub-01/01-01x.md
+
+### [nanobot-workspace-setup]
+> nanobot-ai v0.1.5 workspace with Telegram bot config, OpenRouter+Ollama multi-provider LLM, and portable deployment script
+- Status: DONE
+- Task: 01/sub-02
+- Files: requirements.txt, setup_workspace.py, .env.example, .gitignore, workspace/SOUL.md, workspace/USER.md, workspace/HEARTBEAT.md, workspace/config.json.template, tests/test_setup_workspace.py
+- Depends on: [build-scaffolding]
+- Detail: _build/tasks/01-foundation/sub-02/01-02x.md
