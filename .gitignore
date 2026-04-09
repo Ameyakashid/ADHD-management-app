@@ -1,0 +1,27 @@
+# Environment and secrets
+.env
+*.env.local
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+dist/
+build/
+
+# nanobot runtime (not workspace templates — those are in repo)
+~/.nanobot/sessions/
+~/.nanobot/logs/
+~/.nanobot/media/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,44 @@
+{
+  "providers": {
+    "openrouter": {
+      "apiKey": "${OPENROUTER_API_KEY}"
+    },
+    "ollama": {
+      "apiKey": "ollama"
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": "anthropic/claude-3.5-haiku",
+      "provider": "openrouter",
+      "maxTokens": 4096,
+      "contextWindowTokens": 65536,
+      "temperature": 0.1,
+      "maxToolIterations": 50,
+      "workspace": "~/.nanobot/workspace",
+      "timezone": "America/New_York",
+      "providerRetryMode": "standard",
+      "dream": {
+        "intervalH": 4,
+        "maxBatchSize": 20,
+        "maxIterations": 10,
+        "modelOverride": null
+      }
+    }
+  },
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "token": "${TELEGRAM_BOT_TOKEN}",
+      "allowFrom": ["${TELEGRAM_USER_ID}"],
+      "streaming": true,
+      "streamEditInterval": 0.6,
+      "groupPolicy": "mention",
+      "connectionPoolSize": 32
+    }
+  },
+  "tools": {
+    "web": { "enable": true },
+    "exec": { "enable": false }
+  }
+}
