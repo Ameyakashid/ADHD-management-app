@@ -143,3 +143,20 @@ If you are an LLM agent in any IDE (Antigravity, Cursor, Claude Code, etc.) and 
 - Files: memory_tools.py, tests/test_memory_tools.py
 - Depends on: [memory-entry-store], [nanobot-workspace-setup]
 - Detail: _build/tasks/04-memory/sub-02/04-02x.md
+
+### [memory-context-injection]
+> MemoryContextHook injecting active structured memories into system prompt + SOUL.md memory instructions for all 5 categories + MEMORY.md seed — 21 tests
+- Status: DONE
+- Task: 04/sub-03
+- Files: memory_context.py, workspace/SOUL.md, workspace/memory/MEMORY.md, tests/test_memory_context.py, tests/test_memory_integration.py
+- Depends on: [memory-entry-store], [state-response-integration]
+- Detail: _build/tasks/04-memory/sub-03/04-03x.md
+
+### [memory-system-complete]
+> Full memory pipeline: 5-category structured store, 3 LLM-callable tools (save/list/dismiss), context injection hook, SOUL.md memory guidance, MEMORY.md Dream seed — 90 tests across 6 files
+- Status: DONE-WITH-ISSUES
+- Task: 04 (04-memory)
+- Subtasks: [memory-entry-store], [nanobot-memory-tools], [memory-context-injection]
+- Produces: Complete memory layer for downstream tasks 05-08. MemoryEntryStore persists structured entries (JSON). Three nanobot-ai Tool subclasses expose CRUD to LLM. MemoryContextHook injects active entries into system prompt each message. SOUL.md teaches the bot when/how to use memory tools across 5 categories. MEMORY.md seeded for Dream's Phase 2 editor.
+- Issues: (1) LOW: Double sort in MemoryContextHook._inject + format_memory_entries (redundant, not a bug). (2) LOW: HookContext protocol duplicated in memory_context.py and state_response_integration.py. (3) task-verify.md was not generated — no task-level cross-subtask verification exists.
+- Detail: _build/tasks/04-memory/sub-03/04-03x.md (latest subtask; no task-verify.md)
