@@ -1,6 +1,6 @@
 """Shared protocol for nanobot-ai hook context.
 
-Used by StateResponseHook, MemoryContextHook, and SchedulingHook to define
+Used by StateResponseHook, MemoryContextHook, SchedulingHook, and BufferHook to define
 the minimal interface they need from nanobot-ai's AgentHookContext.
 """
 
