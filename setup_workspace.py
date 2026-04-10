@@ -12,8 +12,11 @@ Usage:
 
 import json
 import logging
+import os
 import shutil
 import sys
+import tempfile
+import urllib.request
 from pathlib import Path
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -25,6 +28,16 @@ NANOBOT_HOME = Path.home() / ".nanobot"
 NANOBOT_WORKSPACE = NANOBOT_HOME / "workspace"
 
 TEMPLATE_FILES = ["SOUL.md", "USER.md", "HEARTBEAT.md", "states.yaml"]
+
+KOKORO_MODELS_DIR = NANOBOT_HOME / "models" / "kokoro"
+KOKORO_MODEL_BASE_URL = (
+    "https://github.com/thewh1teagle/kokoro-onnx"
+    "/releases/download/model-files-v1.0"
+)
+KOKORO_MODEL_FILES = {
+    "kokoro-v1.0.onnx": f"{KOKORO_MODEL_BASE_URL}/kokoro-v1.0.onnx",
+    "voices-v1.0.bin": f"{KOKORO_MODEL_BASE_URL}/voices-v1.0.bin",
+}
 
 ENV_VARS = {
     "OPENROUTER_API_KEY": "OpenRouter API key",
@@ -106,6 +119,45 @@ def write_config(config: dict[str, object], target: Path) -> None:
     log.info("Wrote config.json -> %s", target)
 
 
+def detect_platform() -> str:
+    """Return 'windows', 'darwin', or 'linux' based on sys.platform."""
+    if sys.platform == "win32":
+        return "windows"
+    if sys.platform == "darwin":
+        return "darwin"
+    return "linux"
+
+
+def download_file(url: str, target: Path) -> None:
+    """Download a file from url to target using temp-file + rename for atomicity."""
+    target.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp_path_str = tempfile.mkstemp(dir=target.parent)
+    os.close(fd)
+    tmp_path = Path(tmp_path_str)
+    try:
+        log.info("Downloading %s ...", target.name)
+        urllib.request.urlretrieve(url, tmp_path)
+        shutil.move(str(tmp_path), str(target))
+        log.info("Saved %s (%d MB)", target.name, target.stat().st_size // (1024 * 1024))
+    except Exception:
+        tmp_path.unlink(missing_ok=True)
+        raise
+
+
+def download_tts_models(models_dir: Path) -> list[str]:
+    """Download Kokoro TTS model files if not already present. Returns list of downloaded filenames."""
+    models_dir.mkdir(parents=True, exist_ok=True)
+    downloaded: list[str] = []
+    for filename, url in KOKORO_MODEL_FILES.items():
+        target = models_dir / filename
+        if target.exists():
+            log.info("TTS model %s already exists, skipping", filename)
+            continue
+        download_file(url, target)
+        downloaded.append(filename)
+    return downloaded
+
+
 def create_required_dirs() -> None:
     """Create nanobot directories that the framework expects."""
     for subdir in ["media", "cron", "logs", "sessions", "workspace/memory"]:
@@ -125,6 +177,10 @@ def setup_workspace() -> None:
     create_required_dirs()
     copy_workspace_files(NANOBOT_WORKSPACE)
     write_config(config, NANOBOT_HOME / "config.json")
+
+    platform = detect_platform()
+    log.info("Detected platform: %s", platform)
+    download_tts_models(KOKORO_MODELS_DIR)
 
     log.info("")
     log.info("Workspace deployed to %s", NANOBOT_HOME)
