@@ -43,6 +43,7 @@ class DashboardConfig:
     host: str
     port: int
     data_dir: Path
+    static_dir: Path
 
 
 def load_config_from_env() -> DashboardConfig:
@@ -51,6 +52,7 @@ def load_config_from_env() -> DashboardConfig:
         host=os.environ.get("DASHBOARD_HOST", "0.0.0.0"),
         port=int(os.environ.get("DASHBOARD_PORT", "8085")),
         data_dir=Path(os.environ.get("DASHBOARD_DATA_DIR", "data")),
+        static_dir=Path(os.environ.get("DASHBOARD_STATIC_DIR", "dashboard")),
     )
 
 
@@ -151,6 +153,35 @@ def handle_activity(data_dir: Path) -> dict[str, object]:
 
 RouteHandler = Callable[[Path], dict[str, object]]
 
+# ---------------------------------------------------------------------------
+# Static file serving
+# ---------------------------------------------------------------------------
+
+STATIC_CONTENT_TYPES: dict[str, str] = {
+    ".html": "text/html; charset=utf-8",
+    ".css": "text/css; charset=utf-8",
+    ".js": "application/javascript; charset=utf-8",
+}
+
+
+def resolve_static_file(
+    static_dir: Path, request_path: str
+) -> tuple[bytes, str] | None:
+    """Map a request path to a static file. Returns (content, content_type) or None."""
+    clean = request_path.lstrip("/")
+    if clean == "":
+        clean = "index.html"
+    resolved_root = static_dir.resolve()
+    file_path = (static_dir / clean).resolve()
+    if not str(file_path).startswith(str(resolved_root)):
+        return None
+    if not file_path.is_file():
+        return None
+    content_type = STATIC_CONTENT_TYPES.get(file_path.suffix)
+    if content_type is None:
+        return None
+    return file_path.read_bytes(), content_type
+
 ROUTES: dict[str, str] = {
     "/state": "state",
     "/tasks": "tasks",
@@ -189,9 +220,9 @@ CORS_HEADERS = {
 
 
 def make_handler_class(
-    data_dir: Path,
+    data_dir: Path, static_dir: Path
 ) -> type[BaseHTTPRequestHandler]:
-    """Create a request handler class bound to the given data directory."""
+    """Create a request handler class bound to data and static directories."""
 
     class DashboardHandler(BaseHTTPRequestHandler):
         def _send_cors_headers(self) -> None:
@@ -208,6 +239,13 @@ def make_handler_class(
             self.end_headers()
             self.wfile.write(payload)
 
+        def _send_static(self, content: bytes, content_type: str) -> None:
+            self.send_response(HTTPStatus.OK)
+            self.send_header("Content-Type", content_type)
+            self._send_cors_headers()
+            self.end_headers()
+            self.wfile.write(content)
+
         def do_OPTIONS(self) -> None:
             self.send_response(HTTPStatus.NO_CONTENT)
             self._send_cors_headers()
@@ -215,14 +253,19 @@ def make_handler_class(
 
         def do_GET(self) -> None:
             result = dispatch_route(self.path, data_dir)
-            if result is None:
-                self._send_json(
-                    HTTPStatus.NOT_FOUND,
-                    {"error": f"Unknown endpoint: {self.path}"},
-                )
+            if result is not None:
+                status, body = result
+                self._send_json(status, body)
                 return
-            status, body = result
-            self._send_json(status, body)
+            static = resolve_static_file(static_dir, self.path)
+            if static is not None:
+                content, content_type = static
+                self._send_static(content, content_type)
+                return
+            self._send_json(
+                HTTPStatus.NOT_FOUND,
+                {"error": f"Unknown endpoint: {self.path}"},
+            )
 
         def log_message(self, format: str, *args: object) -> None:
             log.debug(format, *args)
@@ -232,7 +275,7 @@ def make_handler_class(
 
 def create_dashboard_server(config: DashboardConfig) -> HTTPServer:
     """Create an HTTPServer configured for the dashboard API."""
-    handler_class = make_handler_class(config.data_dir)
+    handler_class = make_handler_class(config.data_dir, config.static_dir)
     server = HTTPServer((config.host, config.port), handler_class)
     log.info(
         "Dashboard API listening on %s:%d (data: %s)",

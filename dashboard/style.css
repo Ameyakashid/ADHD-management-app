@@ -1,0 +1,142 @@
+:root {
+  --bg: #121212;
+  --surface: #1e1e1e;
+  --text: #e0e0e0;
+  --text-dim: #9e9e9e;
+  --border: #333;
+  --state-unknown: #9E9E9E;
+  --bar-green: #4CAF50;
+  --bar-yellow: #FFA726;
+  --bar-red: #EF5350;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 1024px;
+  height: 600px;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 18px;
+  line-height: 1.3;
+}
+
+#state-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 90px;
+  background: var(--state-unknown);
+}
+
+#state-name {
+  font-size: 42px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #fff;
+  letter-spacing: 2px;
+}
+
+main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 8px;
+  padding: 8px;
+  height: 510px;
+}
+
+.panel {
+  background: var(--surface);
+  border-radius: 8px;
+  padding: 10px 14px;
+  overflow-y: auto;
+}
+
+.panel h2 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.panel ul {
+  list-style: none;
+}
+
+.panel li {
+  padding: 4px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 16px;
+}
+
+.panel li:last-child {
+  border-bottom: none;
+}
+
+.buffer-item {
+  margin-bottom: 8px;
+}
+
+.buffer-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 16px;
+  margin-bottom: 3px;
+}
+
+.buffer-track {
+  height: 18px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.buffer-fill {
+  height: 100%;
+  border-radius: 4px;
+}
+
+.checkin-enabled {
+  color: var(--text);
+}
+
+.checkin-disabled {
+  color: var(--text-dim);
+  text-decoration: line-through;
+}
+
+.activity-type {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.activity-time {
+  color: var(--text-dim);
+  font-size: 13px;
+}
+
+.empty-msg {
+  color: var(--text-dim);
+}
+
+.panel::-webkit-scrollbar {
+  width: 6px;
+}
+
+.panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.panel::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}

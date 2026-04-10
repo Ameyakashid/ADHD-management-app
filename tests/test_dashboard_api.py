@@ -40,9 +40,18 @@ def data_dir(tmp_path: Path) -> Path:
     return d
 
 
-def _start_test_server(data_dir: Path) -> tuple[HTTPServer, str]:
+@pytest.fixture()
+def static_dir(tmp_path: Path) -> Path:
+    d = tmp_path / "static"
+    d.mkdir()
+    return d
+
+
+def _start_test_server(
+    data_dir: Path, static_dir: Path
+) -> tuple[HTTPServer, str]:
     """Start a server on an ephemeral port, return (server, base_url)."""
-    handler_class = make_handler_class(data_dir)
+    handler_class = make_handler_class(data_dir, static_dir)
     server = HTTPServer(("127.0.0.1", 0), handler_class)
     port = server.server_address[1]
     thread = threading.Thread(target=server.serve_forever, daemon=True)
@@ -51,8 +60,8 @@ def _start_test_server(data_dir: Path) -> tuple[HTTPServer, str]:
 
 
 @pytest.fixture()
-def server_url(data_dir: Path) -> str:
-    server, url = _start_test_server(data_dir)
+def server_url(data_dir: Path, static_dir: Path) -> str:
+    server, url = _start_test_server(data_dir, static_dir)
     yield url
     server.shutdown()
 
