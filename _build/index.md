@@ -61,6 +61,15 @@ If you are an LLM agent in any IDE (Antigravity, Cursor, Claude Code, etc.) and 
 - Depends on: [nanobot-workspace-setup]
 - Detail: _build/tasks/01-foundation/sub-03/01-03x.md
 
+### [personality-core-complete]
+> ADHD-native personality system: neuroaffirming SOUL.md, 6-state cognitive model (Baseline/Focus/Hyperfocus/Avoidance/Overwhelm/RSD) with Markov transitions, and nanobot-ai hook wiring state detection into per-message response adaptation — 212 tests passing
+- Status: DONE-WITH-ISSUES
+- Task: 02 (02-personality)
+- Subtasks: [neuroaffirming-personality], [cognitive-state-detection], [state-response-integration]
+- Produces: Complete personality layer for downstream tasks 03-08. SOUL.md loaded by nanobot-ai runtime with state-aware adaptation rules. StateResponseHook detects cognitive state per message and injects indicator into system prompt. States defined in editable YAML config. ICNU motivation framework and banned-phrase guardrails active. Disco Elysium personality voice stub ready for future milestone.
+- Issues: (1) MEDIUM: normalize_llm_response substring fallback matches "focus" before "hyperfocus" — fix by sorting by length descending (state_detection.py:200-202). (2) task-verify.md was not generated — no task-level cross-subtask verification exists.
+- Detail: _build/tasks/02-personality/sub-03/02-03x.md (latest subtask; no task-verify.md)
+
 ### [neuroaffirming-personality]
 > SOUL.md personality definition with neuroaffirming rules, ICNU motivation framework, banned-phrase list, and AUDHD USER.md profile — plus 40 validation tests
 - Status: DONE
@@ -70,17 +79,42 @@ If you are an LLM agent in any IDE (Antigravity, Cursor, Claude Code, etc.) and 
 - Detail: _build/tasks/02-personality/sub-01/02-01x.md
 
 ### [cognitive-state-detection]
-> 6-state cognitive model (Baseline/Focus/Hyperfocus/Avoidance/Overwhelm/RSD) with YAML config, LLM classification prompt, Markov transition enforcement, and StateName-typed DetectionResult — 132 tests across 3 files
+> 6-state cognitive model (Baseline/Focus/Hyperfocus/Avoidance/Overwhelm/RSD) with YAML config, LLM classification prompt, Markov transition enforcement, and StateName-typed function signatures — 132 tests across 4 files
 - Status: DONE
 - Task: 02/sub-02
 - Files: workspace/states.yaml, state_detection.py, tests/test_state_config.py, tests/test_state_detection.py
 - Depends on: [nanobot-workspace-setup], [neuroaffirming-personality]
+- Issues: (1) MEDIUM: normalize_llm_response substring fallback matches "focus" before "hyperfocus" — fix by sorting by length descending. Low probability due to exact-match fast path.
 - Detail: _build/tasks/02-personality/sub-02/02-02x.md
 
 ### [state-response-integration]
-> Hook connecting cognitive state detection to SOUL.md response rules — injects state indicator into system prompt, per-state behavior for all 6 states, graceful baseline fallback
+> Nanobot-ai hook detecting cognitive state per message, injecting indicator into system prompt, activating per-state SOUL.md response rules — 3 pure functions + StateResponseHook class, 40 tests
 - Status: DONE
 - Task: 02/sub-03
-- Files: state_response_integration.py, workspace/SOUL.md, tests/test_state_response_integration.py
+- Files: state_response_integration.py, workspace/SOUL.md, tests/test_state_response_pure.py, tests/test_state_response_hook.py
 - Depends on: [neuroaffirming-personality], [cognitive-state-detection]
 - Detail: _build/tasks/02-personality/sub-03/02-03x.md
+
+### [task-data-model-store]
+> Task Pydantic model + JSON-persisted TaskStore with full CRUD, atomic writes, pure helper functions — 39 tests
+- Status: DONE
+- Task: 03/sub-01
+- Files: task_store.py, tests/test_task_model.py, tests/test_task_store.py
+- Depends on: [nanobot-workspace-setup]
+- Detail: _build/tasks/03-task-crud/sub-01/03-01x.md
+
+### [nanobot-task-tools]
+> Five LLM-callable nanobot-ai Tool subclasses wrapping TaskStore CRUD — create, list, get, update, complete — with JSON parameter schemas, programmatic registry, 34 tests
+- Status: DONE
+- Task: 03/sub-02
+- Files: task_tools.py, tests/test_task_tools.py
+- Depends on: [task-data-model-store], [nanobot-workspace-setup]
+- Detail: _build/tasks/03-task-crud/sub-02/03-02x.md
+
+### [soul-task-instructions]
+> SOUL.md task management guidance (ADHD-friendly presentation, state-aware behavior) + 29 integration tests verifying full CRUD pipeline and persistence
+- Status: DONE
+- Task: 03/sub-03
+- Files: workspace/SOUL.md, tests/test_task_integration.py
+- Depends on: [neuroaffirming-personality], [task-data-model-store], [nanobot-task-tools], [cognitive-state-detection]
+- Detail: _build/tasks/03-task-crud/sub-03/03-03x.md
