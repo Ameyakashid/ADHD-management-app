@@ -6,6 +6,8 @@ per-state response rules that the LLM applies based on this indicator.
 """
 
 import logging
+from pathlib import Path
+from typing import Callable
 
 from hook_context import HookContext
 from state_detection import (
@@ -14,6 +16,8 @@ from state_detection import (
     StateConfig,
     detect_state,
 )
+
+StateWriterFn = Callable[[Path, str, str, bool], object]
 
 log = logging.getLogger(__name__)
 
@@ -84,10 +88,16 @@ class StateResponseHook:
     """
 
     def __init__(
-        self, config: StateConfig, llm_call: LLMCallable
+        self,
+        config: StateConfig,
+        llm_call: LLMCallable,
+        state_writer: StateWriterFn | None = None,
+        state_file_path: Path | None = None,
     ) -> None:
         self._config = config
         self._llm_call = llm_call
+        self._state_writer = state_writer
+        self._state_file_path = state_file_path
         self._current_state: str = BASELINE_STATE
 
     @property
@@ -106,6 +116,14 @@ class StateResponseHook:
 
         detection = await self._detect_with_fallback(user_message)
         self._current_state = detection.detected_state
+
+        if self._state_writer is not None and self._state_file_path is not None:
+            self._state_writer(
+                self._state_file_path,
+                detection.detected_state,
+                detection.previous_state,
+                detection.is_transition_blocked,
+            )
 
         # System prompt is always messages[0]
         if messages[0].get("role") == "system":
