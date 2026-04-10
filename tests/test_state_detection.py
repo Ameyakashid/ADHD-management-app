@@ -106,6 +106,12 @@ class TestNormalizeLlmResponse:
         with pytest.raises(ValueError, match="unrecognizable state"):
             normalize_llm_response("")
 
+    def test_hyperfocus_not_matched_as_focus(self) -> None:
+        assert normalize_llm_response("I'm in a hyperfocus zone") == "hyperfocus"
+
+    def test_longer_state_matched_before_shorter_substring(self) -> None:
+        assert normalize_llm_response("clearly hyperfocus state") == "hyperfocus"
+
 
 # ---------------------------------------------------------------------------
 # Transition enforcement tests

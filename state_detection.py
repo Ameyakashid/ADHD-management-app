@@ -197,7 +197,7 @@ def normalize_llm_response(raw_response: str) -> StateName:
     if cleaned in ALL_STATES:
         return cleaned
     # Handle cases where LLM wraps the state in quotes or adds minor noise
-    for state in sorted(ALL_STATES):
+    for state in sorted(ALL_STATES, key=len, reverse=True):
         if state in cleaned:
             return state
     raise ValueError(
