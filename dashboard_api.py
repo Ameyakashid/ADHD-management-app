@@ -14,18 +14,14 @@ import json
 import logging
 import os
 from dataclasses import dataclass
-from datetime import date, time
-from functools import partial
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
-from typing import Callable
 
-from buffer_store import Buffer, BufferStore
-from checkin_schedule import CheckInEntry, CheckInScheduleStore
-from cognitive_state_writer import CognitiveStateFile, read_cognitive_state
-from memory_store import MemoryEntry, MemoryEntryStore
-from task_store import Task, TaskStore
+from buffer_store import BufferStore
+from checkin_schedule import CheckInScheduleStore
+from cognitive_state_writer import read_cognitive_state
+from task_store import TaskStore
 
 log = logging.getLogger(__name__)
 
@@ -44,6 +40,7 @@ class DashboardConfig:
     port: int
     data_dir: Path
     static_dir: Path
+    refresh_interval_ms: int
 
 
 def load_config_from_env() -> DashboardConfig:
@@ -53,6 +50,7 @@ def load_config_from_env() -> DashboardConfig:
         port=int(os.environ.get("DASHBOARD_PORT", "8085")),
         data_dir=Path(os.environ.get("DASHBOARD_DATA_DIR", "data")),
         static_dir=Path(os.environ.get("DASHBOARD_STATIC_DIR", "dashboard")),
+        refresh_interval_ms=int(os.environ.get("DASHBOARD_REFRESH_INTERVAL", "30000")),
     )
 
 
@@ -148,12 +146,6 @@ def handle_activity(data_dir: Path) -> dict[str, object]:
 
 
 # ---------------------------------------------------------------------------
-# Route table
-# ---------------------------------------------------------------------------
-
-RouteHandler = Callable[[Path], dict[str, object]]
-
-# ---------------------------------------------------------------------------
 # Static file serving
 # ---------------------------------------------------------------------------
 
@@ -181,15 +173,6 @@ def resolve_static_file(
     if content_type is None:
         return None
     return file_path.read_bytes(), content_type
-
-ROUTES: dict[str, str] = {
-    "/state": "state",
-    "/tasks": "tasks",
-    "/buffers": "buffers",
-    "/schedule": "schedule",
-    "/activity": "activity",
-}
-
 
 def dispatch_route(
     path: str, data_dir: Path
@@ -220,7 +203,7 @@ CORS_HEADERS = {
 
 
 def make_handler_class(
-    data_dir: Path, static_dir: Path
+    data_dir: Path, static_dir: Path, refresh_interval_ms: int = 30000
 ) -> type[BaseHTTPRequestHandler]:
     """Create a request handler class bound to data and static directories."""
 
@@ -252,6 +235,12 @@ def make_handler_class(
             self.end_headers()
 
         def do_GET(self) -> None:
+            if self.path == "/config":
+                self._send_json(
+                    HTTPStatus.OK,
+                    {"refresh_interval_ms": refresh_interval_ms},
+                )
+                return
             result = dispatch_route(self.path, data_dir)
             if result is not None:
                 status, body = result
@@ -275,7 +264,9 @@ def make_handler_class(
 
 def create_dashboard_server(config: DashboardConfig) -> HTTPServer:
     """Create an HTTPServer configured for the dashboard API."""
-    handler_class = make_handler_class(config.data_dir, config.static_dir)
+    handler_class = make_handler_class(
+        config.data_dir, config.static_dir, config.refresh_interval_ms,
+    )
     server = HTTPServer((config.host, config.port), handler_class)
     log.info(
         "Dashboard API listening on %s:%d (data: %s)",

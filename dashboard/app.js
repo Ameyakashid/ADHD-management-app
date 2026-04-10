@@ -1,4 +1,5 @@
 var REFRESH_INTERVAL_MS = 30000;
+var refreshTimer = null;
 
 var STATE_COLORS = {
   baseline: "#4CAF50",
@@ -151,5 +152,11 @@ function refreshAll() {
   });
 }
 
-refreshAll();
-setInterval(refreshAll, REFRESH_INTERVAL_MS);
+fetchJSON("/config").then(function (cfg) {
+  if (cfg && cfg.refresh_interval_ms > 0) {
+    REFRESH_INTERVAL_MS = cfg.refresh_interval_ms;
+  }
+}).catch(function () {}).then(function () {
+  refreshAll();
+  refreshTimer = setInterval(refreshAll, REFRESH_INTERVAL_MS);
+});

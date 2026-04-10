@@ -160,7 +160,7 @@ def download_tts_models(models_dir: Path) -> list[str]:
 
 def create_required_dirs() -> None:
     """Create nanobot directories that the framework expects."""
-    for subdir in ["media", "cron", "logs", "sessions", "workspace/memory"]:
+    for subdir in ["media", "cron", "logs", "sessions", "workspace/memory", "data"]:
         path = NANOBOT_HOME / subdir
         path.mkdir(parents=True, exist_ok=True)
 
@@ -184,7 +184,7 @@ def setup_workspace() -> None:
 
     log.info("")
     log.info("Workspace deployed to %s", NANOBOT_HOME)
-    log.info("Start the bot with: nanobot gateway")
+    log.info("Start the bot with: python start.py")
 
 
 if __name__ == "__main__":
