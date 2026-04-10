@@ -135,3 +135,11 @@ If you are an LLM agent in any IDE (Antigravity, Cursor, Claude Code, etc.) and 
 - Files: memory_store.py, tests/test_memory_model.py, tests/test_memory_store.py
 - Depends on: [nanobot-workspace-setup]
 - Detail: _build/tasks/04-memory/sub-01/04-01x.md
+
+### [nanobot-memory-tools]
+> Three LLM-callable nanobot-ai Tool subclasses wrapping MemoryEntryStore CRUD — save, list, dismiss — with JSON parameter schemas, ToolRegistry registration, 26 tests
+- Status: DONE
+- Task: 04/sub-02
+- Files: memory_tools.py, tests/test_memory_tools.py
+- Depends on: [memory-entry-store], [nanobot-workspace-setup]
+- Detail: _build/tasks/04-memory/sub-02/04-02x.md
