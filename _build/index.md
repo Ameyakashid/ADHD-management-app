@@ -95,6 +95,15 @@ If you are an LLM agent in any IDE (Antigravity, Cursor, Claude Code, etc.) and 
 - Depends on: [neuroaffirming-personality], [cognitive-state-detection]
 - Detail: _build/tasks/02-personality/sub-03/02-03x.md
 
+### [task-crud-complete]
+> Full task management pipeline: Pydantic data model + JSON-persisted TaskStore, 5 LLM-callable nanobot-ai Tool wrappers (create/list/get/update/complete), ADHD-friendly SOUL.md task guidance with 6-state cognitive awareness — 102 tests passing
+- Status: DONE-WITH-ISSUES
+- Task: 03 (03-task-crud)
+- Subtasks: [task-data-model-store], [nanobot-task-tools], [soul-task-instructions]
+- Produces: TaskStore CRUD API (task_store.py) and 5 registered Tool subclasses (task_tools.py) for downstream tasks 04-08. SOUL.md now includes Task Management section with state-aware presentation rules. Scheduling (task-05) and buffer system (task-06) can build on the Task model and store. Tools require programmatic registration via register_task_tools() at nanobot startup — config.json wiring not yet connected.
+- Issues: (1) task-verify.md was not generated — no task-level cross-subtask verification exists. (2) LOW: apply_updates mixes JSON-mode and Python-mode dicts (task_store.py:95-98). (3) LOW: No file locking for concurrent TaskStore access (acceptable for single-user). (4) LOW: test helper `run()` missing type annotations (test_task_integration.py:58). (5) Tools not yet wired into nanobot startup — register_task_tools() call deferred to future integration.
+- Detail: _build/tasks/03-task-crud/sub-03/03-03x.md (latest subtask; no task-verify.md)
+
 ### [task-data-model-store]
 > Task Pydantic model + JSON-persisted TaskStore with full CRUD, atomic writes, pure helper functions — 39 tests
 - Status: DONE
@@ -118,3 +127,11 @@ If you are an LLM agent in any IDE (Antigravity, Cursor, Claude Code, etc.) and 
 - Files: workspace/SOUL.md, tests/test_task_integration.py
 - Depends on: [neuroaffirming-personality], [task-data-model-store], [nanobot-task-tools], [cognitive-state-detection]
 - Detail: _build/tasks/03-task-crud/sub-03/03-03x.md
+
+### [memory-entry-store]
+> JSON-persisted structured memory store — 5 categories (commitment/deadline/blocker/energy_state/context_switch), Pydantic model, soft-delete resolve, atomic writes — 43 tests
+- Status: DONE
+- Task: 04/sub-01
+- Files: memory_store.py, tests/test_memory_model.py, tests/test_memory_store.py
+- Depends on: [nanobot-workspace-setup]
+- Detail: _build/tasks/04-memory/sub-01/04-01x.md
