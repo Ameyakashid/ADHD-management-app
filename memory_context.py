@@ -6,8 +6,8 @@ after the ## Long-term Memory section built by nanobot's ContextBuilder.
 """
 
 import logging
-from typing import Protocol
 
+from hook_context import HookContext
 from memory_store import MemoryEntry, MemoryEntryStore
 
 log = logging.getLogger(__name__)
@@ -16,13 +16,6 @@ DEFAULT_MAX_INJECTED_ENTRIES: int = 20
 
 ACTIVE_MEMORIES_HEADING = "## Active Memories"
 LONG_TERM_MEMORY_HEADING = "## Long-term Memory"
-
-
-class HookContext(Protocol):
-    """Minimal protocol matching nanobot-ai AgentHookContext.messages."""
-
-    @property
-    def messages(self) -> list[dict[str, str]]: ...
 
 
 def format_single_entry(entry: MemoryEntry) -> str:

@@ -6,8 +6,8 @@ per-state response rules that the LLM applies based on this indicator.
 """
 
 import logging
-from typing import Protocol
 
+from hook_context import HookContext
 from state_detection import (
     DetectionResult,
     LLMCallable,
@@ -21,16 +21,6 @@ STATE_INDICATOR_PREFIX = "[Current cognitive state: "
 STATE_INDICATOR_SUFFIX = "]"
 
 BASELINE_STATE = "baseline"
-
-
-class HookContext(Protocol):
-    """Minimal protocol for the hook context passed by nanobot-ai.
-
-    Matches the shape of AgentHookContext.messages used in before_iteration.
-    """
-
-    @property
-    def messages(self) -> list[dict[str, str]]: ...
 
 
 def build_state_indicator(state_name: str) -> str:
