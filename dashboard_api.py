@@ -165,7 +165,7 @@ def resolve_static_file(
         clean = "index.html"
     resolved_root = static_dir.resolve()
     file_path = (static_dir / clean).resolve()
-    if not str(file_path).startswith(str(resolved_root)):
+    if not file_path.is_relative_to(resolved_root):
         return None
     if not file_path.is_file():
         return None

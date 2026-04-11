@@ -105,8 +105,12 @@ def write_cognitive_state(
 
 
 def read_cognitive_state(file_path: Path) -> CognitiveStateFile | None:
-    """Read persisted cognitive state from disk. Returns None if missing."""
+    """Read persisted cognitive state from disk. Returns None if missing or corrupt."""
     if not file_path.exists():
         return None
-    raw = file_path.read_text(encoding="utf-8")
-    return deserialize_state_file(raw)
+    try:
+        raw = file_path.read_text(encoding="utf-8")
+        return deserialize_state_file(raw)
+    except (json.JSONDecodeError, ValueError) as exc:
+        log.warning("Corrupt cognitive state file, returning None: %s", exc)
+        return None

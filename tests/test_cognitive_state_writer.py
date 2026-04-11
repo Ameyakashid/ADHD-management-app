@@ -157,3 +157,9 @@ class TestReadCognitiveState:
         result = read_cognitive_state(file_path)
         assert result is not None
         assert result.current.state == "overwhelm"
+
+    def test_returns_none_on_corrupt_file(self, tmp_path: Path) -> None:
+        file_path = tmp_path / "state.json"
+        file_path.write_text("not valid json {{{", encoding="utf-8")
+        result = read_cognitive_state(file_path)
+        assert result is None
