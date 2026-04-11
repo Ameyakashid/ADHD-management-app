@@ -161,6 +161,33 @@ If you are an LLM agent in any IDE (Antigravity, Cursor, Claude Code, etc.) and 
 - Depends on: [memory-entry-store], [state-response-integration]
 - Detail: _build/tasks/04-memory/sub-03/04-03x.md
 
+### [scheduling-complete]
+> State-adaptive check-in scheduling: 4 check-in types, 6×4 cognitive-state evaluation matrix (fire/defer/modify/suppress), heartbeat hook integration, shared HookContext extraction, SOUL.md+HEARTBEAT.md guidance — 124 tests, hyperfocus substring bug fixed
+- Status: DONE-WITH-ISSUES
+- Task: 05 (05-scheduling)
+- Subtasks: [checkin-schedule-engine], [state-aware-scheduling-logic], [scheduling-heartbeat-integration]
+- Produces: Complete scheduling layer for downstream tasks 06-08. CheckInScheduleStore persists 4 configurable check-in types (morning_motivation, morning_plan, afternoon_check, evening_review) with staleness-guarded due detection. schedule_engine.py maps (check-in type × cognitive state) to actions via pure evaluate_checkin(). SchedulingHook reads enriched system prompt after StateResponseHook and MemoryContextHook, injects formatted check-in blocks into heartbeat sessions. hook_context.py provides shared HookContext Protocol for all 3 hooks. SOUL.md has per-type tone/content guidance. HEARTBEAT.md expanded to all 4 types. Hyperfocus substring ordering bug fixed in state_detection.py.
+- Issues: (1) MEDIUM: test_schedule_engine.py (371 lines) and test_scheduling_hook.py (494 lines) both exceed 300-line limit — split recommended. (2) LOW: RSD handled as implicit else in evaluate_checkin — could add explicit check. (3) LOW: Unused timezone import in checkin_schedule.py. (4) task-verify.md was not generated — no task-level cross-subtask verification exists.
+- Detail: _build/tasks/05-scheduling/sub-03/05-03x.md (latest subtask; no task-verify.md)
+
+### [buffer-system-complete]
+> Full buffer system for recurring obligations: Pydantic model + JSON-persisted BufferStore, 5 LLM-callable nanobot-ai tools (create/list/get/refill/decrement), auto-decrement heartbeat hook with low-level alert injection, ADHD-friendly SOUL.md+HEARTBEAT.md guidance — 147 tests passing
+- Status: DONE-WITH-ISSUES
+- Task: 06 (06-buffer)
+- Subtasks: [buffer-data-model-store], [nanobot-buffer-tools], [buffer-heartbeat-hook]
+- Produces: Complete buffer layer for downstream tasks 07-08. BufferStore persists pre-loaded units of recurring obligations (JSON). Five Tool subclasses expose CRUD+refill+decrement to LLM. BufferHook auto-decrements due buffers in heartbeat sessions and injects factual alerts (no guilt language) into system prompt when levels hit threshold. SOUL.md has 6-state cognitive-aware buffer guidance. HEARTBEAT.md has buffer monitoring section. Hook chain is now 4 deep: StateResponseHook → MemoryContextHook → SchedulingHook → BufferHook. Tools require programmatic registration via register_buffer_tools() at nanobot startup — config.json wiring not yet connected.
+- Issues: (1) MEDIUM: test_buffer_model.py at 348 lines exceeds 300-line limit — split recommended. (2) LOW: apply_buffer_updates mixes JSON/Python-mode dicts (consistent with task_store.py). (3) LOW: BufferUpdate lacks Field constraints (caught at Buffer revalidation). (4) task-verify.md was not generated — no task-level cross-subtask verification exists.
+- Detail: _build/tasks/06-buffer/sub-03/06-03x.md (latest subtask; no task-verify.md)
+
+### [buffer-data-model-store]
+> Buffer Pydantic model + JSON-persisted BufferStore with CRUD, decrement (level-1 + advance due date), refill (capped at capacity), atomic writes — 72 tests, verified PASS
+- Status: DONE
+- Task: 06/sub-01
+- Files: buffer_store.py (285 lines), tests/test_buffer_model.py (348 lines), tests/test_buffer_store.py (266 lines)
+- Depends on: [nanobot-workspace-setup]
+- Issues: (1) MEDIUM: test_buffer_model.py at 348 lines exceeds 300-line limit — split recommended after TestBuildBuffer. (2) LOW: apply_buffer_updates mixes JSON/Python-mode dicts (same as task_store.py). (3) LOW: BufferUpdate lacks Field constraints (consistent with TaskUpdate).
+- Detail: _build/tasks/06-buffer/sub-01/06-01x.md
+
 ### [checkin-schedule-engine]
 > Check-in schedule data model (4 types), JSON-persisted store, pure due-check engine with staleness guard, + hyperfocus substring bug fix — 44 tests
 - Status: DONE
@@ -168,3 +195,103 @@ If you are an LLM agent in any IDE (Antigravity, Cursor, Claude Code, etc.) and 
 - Files: checkin_schedule.py, tests/test_checkin_schedule.py, state_detection.py, tests/test_state_detection.py
 - Depends on: [nanobot-workspace-setup], [cognitive-state-detection]
 - Detail: _build/tasks/05-scheduling/sub-01/05-01x.md
+
+### [state-aware-scheduling-logic]
+> Pure decision layer: 6×4 state×check-in evaluation matrix (fire/defer/modify/suppress) + context assembly from TaskStore/MemoryEntryStore — 44 tests
+- Status: DONE
+- Task: 05/sub-02
+- Files: schedule_engine.py, tests/test_schedule_engine.py
+- Depends on: [checkin-schedule-engine], [cognitive-state-detection], [task-data-model-store], [memory-entry-store]
+- Detail: _build/tasks/05-scheduling/sub-02/05-02x.md
+
+### [scheduling-heartbeat-integration]
+> Nanobot-ai hook wiring scheduling engine into heartbeat sessions — proactive check-in delivery with state-aware gating, SOUL.md guidance, shared HookContext extraction — 36 tests
+- Status: DONE
+- Task: 05/sub-03
+- Files: hook_context.py, scheduling_hook.py, state_response_integration.py, memory_context.py, workspace/SOUL.md, workspace/HEARTBEAT.md, tests/test_scheduling_hook.py
+- Depends on: [checkin-schedule-engine], [state-aware-scheduling-logic], [state-response-integration], [memory-context-injection], [task-data-model-store], [memory-entry-store]
+- Detail: _build/tasks/05-scheduling/sub-03/05-03x.md
+
+### [nanobot-buffer-tools]
+> Five LLM-callable nanobot-ai Tool subclasses wrapping BufferStore (create/list/get/refill/decrement) + SOUL.md ADHD-friendly buffer guidance with 6-state cognitive awareness — 37 tests
+- Status: DONE
+- Task: 06/sub-02
+- Files: buffer_tools.py, tests/test_buffer_tools.py, tests/test_buffer_format.py, workspace/SOUL.md
+- Depends on: [buffer-data-model-store], [neuroaffirming-personality], [cognitive-state-detection]
+- Detail: _build/tasks/06-buffer/sub-02/06-02x.md
+
+### [buffer-heartbeat-hook]
+> Auto-decrement hook for due buffers with low-level alert injection into system prompt — staleness guard via due-date advancement, ADHD-friendly factual alerts, HEARTBEAT.md buffer monitoring section — 38 tests
+- Status: DONE
+- Task: 06/sub-03
+- Files: buffer_hook.py, tests/test_buffer_hook.py, tests/test_buffer_hook_lifecycle.py, hook_context.py, workspace/HEARTBEAT.md
+- Depends on: [buffer-data-model-store], [nanobot-buffer-tools], [scheduling-heartbeat-integration]
+- Detail: _build/tasks/06-buffer/sub-03/06-03x.md
+
+### [voice-system-complete]
+> Full voice output pipeline: Kokoro TTS engine (kokoro-onnx), WAV-to-OGG/Opus delivery via SpeakTool, state-aware auto-voice hook detecting check-in/buffer-alert triggers — 5-hook chain complete, env var toggle, SOUL.md+HEARTBEAT.md voice guidance — 116 tests
+- Status: DONE-WITH-ISSUES
+- Task: 07 (07-voice)
+- Subtasks: [kokoro-tts-engine], [voice-delivery-speak-tool], [voice-trigger-hook]
+- Produces: Complete voice layer for downstream task 08. tts_engine.py synthesizes text→WAV via kokoro-onnx ONNX Runtime. voice_delivery.py converts WAV→OGG/Opus via PyAV. SpeakTool wraps the full TTS→convert→Telegram send pipeline as an LLM-callable nanobot-ai Tool with MessageTool delegation for chat routing. VoiceHook (5th position in hook chain: StateResponse→MemoryContext→Scheduling→Buffer→Voice) detects check-in and buffer-alert headings in system prompt, evaluates a 6-state×2-trigger matrix, and injects Voice Delivery instruction blocks for the LLM. Voice is auto-triggered in baseline+avoidance for check-ins, baseline-only for buffer alerts; suppressed in focus/hyperfocus/overwhelm/RSD. User-initiated voice ("say that aloud") taught via SOUL.md direct SpeakTool invocation. VOICE_AUTO_ENABLED env var toggles auto-voice at runtime without restart. setup_workspace.py extended with portable model download (kokoro-v1.0.onnx + voices-v1.0.bin).
+- Issues: (1) MEDIUM: test_voice_trigger_hook.py at 404 lines exceeds 300-line limit — split recommended. (2) LOW: task-verify.md was not generated — no task-level cross-subtask verification exists. (3) LOW: Tools require programmatic registration via register_voice_tools() at nanobot startup — config.json wiring not yet connected.
+- Detail: _build/tasks/07-voice/sub-03/07-03x.md (latest subtask; no task-verify.md)
+
+### [kokoro-tts-engine]
+> Kokoro TTS wrapper (kokoro-onnx): synthesize_speech() takes text → returns WAV bytes, with portable model download in setup_workspace.py and lazy-loaded singleton — 35 tests
+- Status: DONE
+- Task: 07/sub-01
+- Files: tts_engine.py, setup_workspace.py, requirements.txt, tests/test_tts_engine.py, tests/test_model_download.py
+- Depends on: [nanobot-workspace-setup]
+- Detail: _build/tasks/07-voice/sub-01/07-01x.md
+
+### [voice-delivery-speak-tool]
+> WAV-to-OGG/Opus conversion via PyAV + SpeakTool nanobot-ai Tool wrapping TTS→convert→Telegram send pipeline, with MessageTool delegation for routing — 31 tests
+- Status: DONE
+- Task: 07/sub-02
+- Files: voice_delivery.py, voice_tools.py, tests/test_voice_delivery.py, tests/test_voice_tools.py, requirements.txt
+- Depends on: [kokoro-tts-engine], [nanobot-workspace-setup]
+- Detail: _build/tasks/07-voice/sub-02/07-02x.md
+
+### [voice-trigger-hook]
+> State-aware auto-voice hook: detects check-in/buffer-alert headings in system prompt, evaluates 6-state x 2-trigger matrix, injects Voice Delivery instruction block for LLM to use SpeakTool — env var toggle, SOUL.md+HEARTBEAT.md voice guidance — 50 tests
+- Status: DONE
+- Task: 07/sub-03
+- Files: voice_trigger_hook.py, tests/test_voice_trigger_hook.py, workspace/SOUL.md, workspace/HEARTBEAT.md, .env.example
+- Depends on: [scheduling-heartbeat-integration], [buffer-heartbeat-hook], [cognitive-state-detection], [voice-delivery-speak-tool]
+- Detail: _build/tasks/07-voice/sub-03/07-03x.md
+
+### [dashboard-complete]
+> Always-on Fire Tablet dashboard: stdlib HTTP API (5 data endpoints + /config), dark-theme HTML/CSS/JS frontend (auto-refresh 30s), cognitive state persistence, Python launcher (start.py) — glanceable passive display for state, tasks, buffers, schedule, activity
+- Status: DONE-WITH-ISSUES
+- Task: 08 (08-dashboard)
+- Subtasks: [dashboard-data-api], [dashboard-frontend], [dashboard-startup-integration]
+- Produces: Complete dashboard surface for Fire Tablet. start.py is the single entry point launching nanobot gateway + dashboard server in parallel. dashboard_api.py serves 6 endpoints (state/tasks/buffers/schedule/activity/config) from existing stores with CORS. Frontend auto-refreshes at server-configured interval. cognitive_state_writer.py persists state from StateResponseHook to disk for dashboard consumption. SOUL.md teaches bot dashboard awareness. DASHBOARD.md documents Fire Tablet Silk browser setup. setup_workspace.py creates data/ dir. This is the final task — all 8 tasks complete.
+- Issues: (1) MEDIUM: resolve_static_file path traversal — str.startswith bypassed by sibling dirs, fix with Path.is_relative_to(). (2) MEDIUM: read_cognitive_state() doesn't handle corrupt JSON — will crash /state endpoint. (3) LOW: fetchJSON doesn't check response.ok. (4) task-verify.md was not generated — no task-level cross-subtask verification exists.
+- Detail: _build/tasks/08-dashboard/sub-03/08-03x.md (latest subtask; no task-verify.md)
+
+### [dashboard-data-api]
+> Read-only HTTP API (stdlib http.server) serving cognitive state, tasks, buffers, schedule, and activity feed as JSON — plus cognitive state persistence from StateResponseHook to disk
+- Status: DONE-WITH-ISSUES
+- Task: 08/sub-01
+- Files: dashboard_api.py, cognitive_state_writer.py, state_response_integration.py, tests/test_dashboard_api.py, tests/test_cognitive_state_writer.py, .env.example
+- Depends on: [task-data-model-store], [buffer-data-model-store], [checkin-schedule-engine], [memory-entry-store], [cognitive-state-detection], [state-response-integration]
+- Issues: (1) MEDIUM: resolve_static_file path traversal — str.startswith prefix check bypassed by sibling dirs, fix with Path.is_relative_to(). (2) MEDIUM: read_cognitive_state() doesn't handle corrupt JSON, will 500 on /state. (3) MEDIUM: ROUTES dict dead code. (4) LOW: 5 unused imports in dashboard_api.py. (5) LOW: DASHBOARD_STATIC_DIR missing from .env.example.
+- Detail: _build/tasks/08-dashboard/sub-01/08-01x.md
+
+### [dashboard-frontend]
+> Fire Tablet dark-theme dashboard: cognitive state banner, buffer gauges, tasks, schedule, activity feed — auto-refreshes 30s, static serving in dashboard_api.py, 39 tests passing
+- Status: DONE
+- Task: 08/sub-02
+- Files: dashboard/index.html, dashboard/style.css, dashboard/app.js, dashboard_api.py, tests/test_dashboard_static.py, tests/test_dashboard_api.py
+- Depends on: [dashboard-data-api], [cognitive-state-detection], [task-data-model-store], [buffer-data-model-store], [checkin-schedule-engine]
+- Issues: (1) MEDIUM (pre-existing): str.startswith path traversal bypass in resolve_static_file — use is_relative_to(). (2) LOW: ROUTES dict + unused imports dead code. (3) LOW: fetchJSON doesn't check response.ok.
+- Detail: _build/tasks/08-dashboard/sub-02/08-02x.md
+
+### [dashboard-startup-integration]
+> Dashboard config endpoint, Python launcher (start.py), SOUL.md awareness, Fire Tablet docs, setup_workspace.py data dir — wires dashboard into project startup
+- Status: DONE
+- Task: 08/sub-03
+- Files: start.py, dashboard_api.py, dashboard/app.js, .env.example, workspace/SOUL.md, workspace/DASHBOARD.md, setup_workspace.py, tests/test_dashboard_integration.py
+- Depends on: [dashboard-data-api], [dashboard-frontend], [nanobot-workspace-setup]
+- Detail: _build/tasks/08-dashboard/sub-03/08-03x.md

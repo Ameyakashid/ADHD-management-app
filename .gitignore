@@ -22,6 +22,20 @@ build/
 *.swp
 *.swo
 
+# Agent framework (not part of the app)
+Antigravity-Agent-guided/
+_build/
+templates/
+rules/
+run-task.sh
+.claude/
+
+# User data (generated at runtime)
+workspace/memory/
+workspace/data/
+*.jsonl
+state.json
+
 # OS
 .DS_Store
 Thumbs.db

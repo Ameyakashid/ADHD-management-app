@@ -62,10 +62,10 @@ class BufferUpdate(BaseModel):
     """
 
     name: str | None = None
-    buffer_capacity: int | None = None
-    recurrence_interval_days: int | None = None
+    buffer_capacity: int | None = Field(default=None, ge=1)
+    recurrence_interval_days: int | None = Field(default=None, ge=1)
     next_due_date: date | None = None
-    alert_threshold: int | None = None
+    alert_threshold: int | None = Field(default=None, ge=0)
     status: BufferStatus | None = None
 
 
@@ -140,7 +140,7 @@ def refill_buffer(buffer: Buffer, units: int) -> Buffer:
 
 def apply_buffer_updates(buffer: Buffer, updates: BufferUpdate) -> Buffer:
     """Return a new Buffer with the specified fields changed."""
-    changes = updates.model_dump(exclude_unset=True)
+    changes = updates.model_dump(exclude_unset=True, mode="json")
     if not changes:
         return buffer
     current = buffer.model_dump(mode="json")
